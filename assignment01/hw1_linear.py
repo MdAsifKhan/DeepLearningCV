@@ -40,6 +40,7 @@ def l2loss(X,y,W,b):
     Should return three variables: (i) the l2 loss: scalar, (ii) the gradient with respect to W, (iii) the gradient with respect to b
      """
     pred = predict(X, W, b)
+    pdb.set_trace()
     l2 = np.sum(np.square(y-pred))
     gradE_pred = y - pred
     gradE_h = gradE_pred*pred*(1-pred)
@@ -61,12 +62,12 @@ def train(X,y,W,b, num_iters=1000, eta=0.001):
     Should return the final values of W and b    
      """
     loss = []
-    alpha = 1
+    eta = 1
     for i in range(num_iters):
         l2, gradE_W, gradE_b = l2loss(X, y, W, b)
 
-        W = W - alpha*gradE_W 
-        b = b - alpha*gradE_b
+        W = W - eta*gradE_W 
+        b = b - eta*gradE_b
 
         loss.append(l2)
     plt.plot(range(num_iters), loss)

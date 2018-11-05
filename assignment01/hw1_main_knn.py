@@ -28,7 +28,7 @@ for label in label_sample_idx:
 x_train_sample, y_train_sample = X_train[sample_idx], y_train[sample_idx]
 
 # Reshape images
-X_train = np.reshape(x_train_sample, (x_train_sample.shape[0], -1))
+x_train_sample = np.reshape(x_train_sample, (x_train_sample.shape[0], -1))
 X_test = np.reshape(X_test, (X_test.shape[0], -1))
 
 

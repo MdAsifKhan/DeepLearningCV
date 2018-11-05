@@ -27,10 +27,11 @@ b0 = 0
 # Optimization
 num_iters = 100 
 eta = 0.001
+pdb.set_trace()
 W,b = mlBasics.train(X_train, y_train, W0, b0, num_iters, eta)
  
 
 # Test on test data 
 yhat = mlBasics.predict(X_test, W, b)>=.5 
-print(np.mean(yhat==y_test)*100, "% of test examples classified correctly.")
+print(np.mean(yhat==y_test)*100, "of test examples classified correctly.")
   
