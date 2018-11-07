@@ -6,6 +6,7 @@ This is a repository, under implementation as a part of Deep Learning for Visual
 
 
 * [Assignment 1:k-nearest neighbor and linear regression on MNIST](https://github.com/MdAsifKhan/DeepLearningCV/tree/master/assignment01)
+	
 	This assignment is a simple introduction to machine learning methods. We implement two algorithms k-nearest neighbor classifier and linear regression. For evaluation we use MNIST dataset.
 
 * [Assignment 2: Will appear soon]
