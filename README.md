@@ -1,6 +1,6 @@
 # DeepLearningCV: Deep Learning for Visual Recognition
 
-This is a repository, under implementation as a part of Deep Learning for Visual Recognition course offered at University of Bonn. Here we implement different deep learning model and validate them for visual recognition task mainly object classification. ALl implementations are part of learning exercise and can be used by anyone else.
+This is a repository, under implementation as a part of Deep Learning for Visual Recognition course offered at University of Bonn. Here we implement different deep learning model and validate them for visual recognition task mainly object classification. All implementations are part of learning exercise and can be used by anyone else.
 
 ## Assignment Overview
 
