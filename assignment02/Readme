@@ -1,0 +1,14 @@
+In this assignment we are training a Multi-Layer Perceptron. We will test our classifier on the ORL Database of faces.
+
+We will start with the load_ORL_faces.py file. Here we have loaded our dataset into training_image(trainX), training_label(trainY), test_images(testX) and test_labels(testX). Then we have normalized our training and test images and finally converted into TensorDataset to make it iterable.
+Then we have initialized all the hyperparameters and parameters for our neural network like different number of hidden layers we need, number of hidden layer neurons, number of output neurons, type of activation function we need etc.
+
+Now we will call MLP class (from model.py) to actually construct our network/model. And in the forward() our data/images will pass through our network and will return its prediction.
+
+In the ModelEvaluator class we have defined our training testing and validation function. And will calculate the accuracy and loss of our model.
+In its constructor we have initialized our different optimizers to see check on which optimizer our model performs best (means gives better accuracy).
+
+In the train() we are training our model for certain number of epochs and check its loss.
+And then in the validation() and test() we have tested our model and checked the accuracy of our model.
+
+And finally we are plotting both the train and test loss.
