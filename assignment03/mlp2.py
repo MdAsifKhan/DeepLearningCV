@@ -19,8 +19,7 @@ n_in = np.prod(trainset[0][0].numpy().shape)
 print(n_in)
 n_out = 10
 
-# Task 1
-# (A) MLP I OPT SGD
+# (B) MLP II OPT NESTEROV
 # Hyperparameters
 lr = 0.01
 n_hidden = [800, 800]
