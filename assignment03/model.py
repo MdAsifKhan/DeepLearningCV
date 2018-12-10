@@ -95,9 +95,9 @@ class ModelEvaluator:
 			train_preds = self.model.forward(train_data)
 			loss = self.model.loss(train_preds, train_labels)
 			if self.reg=='l2':
-				loss = self.regularization(loss, lam=1, reg='l2')
+				loss = self.regularization(loss, lam=0.0001, reg='l2')
 			elif self.reg=='l1':
-				loss = self.regularization(loss, lam=1, reg='l1')
+				loss = self.regularization(loss, lam=0.000001, reg='l1')
 			else:
 				pass				
 			self.optimizer.zero_grad()
@@ -148,7 +148,7 @@ class ModelEvaluator:
 		return acc_
 
 	def regularization(self, loss, lam, reg='l2'):
-		ll = 0
+		ll = torch.tensor(0.0)
 		for W in self.model.parameters():
 			if reg=='l2':
 				ll += W.norm(2)
