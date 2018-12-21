@@ -1,7 +1,7 @@
 import numpy as np  
 import torch
 from model import ModelEvaluator, CNN
-from utils import plot_img
+from utils import plot_img, vistensor
 import matplotlib.pyplot as plt
 
 
@@ -11,8 +11,6 @@ trainX = data['trainX']
 trainY = data['trainY']
 testX = data['testX']
 testY = data['testY']
-
-import pdb
 
 train_images, test_images = trainX.shape[0], testX.shape[0]
 trainX = trainX.astype(np.float32).reshape(train_images, 112, 92)
@@ -24,6 +22,8 @@ testY = testY.astype(np.long)
 sample_set = np.random.randint(0, train_images, 50)
 plt = plot_img(trainX[sample_set])
 plt.savefig('sanity_check_img_plot')
+plt.cla()
+plt.clf()
 
 trainX = torch.from_numpy(trainX)
 trainY = torch.from_numpy(trainY)
@@ -43,7 +43,7 @@ lr = 0.001
 epochs = 15
 
 # Model
-drop_p = 0.1
+drop_p = 0.0
 n_in = trainX.shape[1]
 n_out = len(np.unique(trainY))
 
@@ -51,14 +51,54 @@ pool = 'max'
 optim = 'adam'
 use_gpu = True
 
-model = CNN(pool)
+model = CNN(pool, drop_p=drop_p)
 modeleval = ModelEvaluator(model, epochs, lr, batch_size, use_gpu=use_gpu, optim=optim)
-
 acc_ = modeleval.evaluator(train_loader, test_loader, print_every=100)
 
 modelname = 'model_optimizer_{}_lr_{}'.format(optim, lr)
 print('Accuracy of {0} is {1:.2f}'.format(modelname, acc_))
 
-torch.save(modeleval.model.state_dict(), modelname)
+
 plt = modeleval.plot_loss()
-plt.savefig('train_test_loss, optim_{}_lr_{}'.format(optim, lr))
+plt.savefig('train_test_loss, optim_{}_lr_{}_.png'.format(optim, lr))
+plt.cla()
+plt.clf()
+
+
+plt = modeleval.plot_acc()
+plt.savefig('test_acc, optim_{}, _lr_{}_.png'.format(optim, lr))
+plt.cla()
+plt.clf()
+
+plt = modeleval.plot_iter_loss()
+plt.savefig('train_iterloss, optim_{}, _lr_{}_.png'.format(optim, lr))
+plt.cla()
+plt.clf()
+
+
+
+# Visualize Kernels
+
+filters = model.modules()
+model_layers = [i for i in model.children()]
+first_layer = model_layers[0]
+second_layer = model_layers[3]
+
+first_kernels = first_layer.weight.data.clone()
+print(first_kernels.shape)
+vistensor(first_kernels)
+plt.axis('off')
+plt.ioff()
+plt.savefig('filter conv 1 optim_{}_lr_{}_.png'.format(optim, lr))
+plt.cla()
+plt.clf()
+
+
+second_kernels = second_layer.weight.data.clone()
+print(second_kernels.shape)
+vistensor(second_kernels[0, ...].reshape(1, 32, 3,3))
+plt.axis('off')
+plt.ioff()
+plt.savefig('filter conv 2 optim_{}_lr_{}_.png'.format(optim, lr))
+plt.cla()
+plt.clf()
