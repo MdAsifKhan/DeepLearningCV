@@ -1,6 +1,6 @@
 from torchvision import utils
 import matplotlib.pyplot as plt
-
+import numpy as np
 
 def vistensor(tensor, ch=0, nrow=20, padding=1): 
     '''
