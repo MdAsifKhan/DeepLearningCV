@@ -13,6 +13,9 @@ This is a repository, under implementation as a part of Deep Learning for Visual
 	
 	In this exercise we implement MLP using pytorch and use it to classify MNIST dataset and ORL database of faces.
 
+* [Assignment 3: MLP with sgd and nesterov momentum](https://github.com/MdAsifKhan/DeepLearningCV/tree/master/assignment03)
+
+* [Assignment 4: CNN for face classification](https://github.com/MdAsifKhan/DeepLearningCV/tree/master/assignment04)
 
 ## References
 
