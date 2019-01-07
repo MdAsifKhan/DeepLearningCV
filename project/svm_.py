@@ -1,14 +1,21 @@
-from sklearn import svm
 import os
 import torch.utils.data
 import torchvision.datasets as dset
 import torchvision.transforms as transforms
-from GAN import Generator
+from GAN import Discriminator
 import numpy as np
 import torch.backends.cudnn as cudnn
+from sklearn.model_selection import train_test_split
+from sklearn.metrics import classification_report
+from sklearn import svm
 
 cudnn.benchmark = True
 
+def assert_path(path):
+    if os.path.isdir(path):
+        pass
+    else:
+        os.makedirs(path)
 
 def save_features(dataloader, batch_size, n_features, filename):
     features_ = np.zeros([len(dataloader), batch_size, n_features])
@@ -24,12 +31,12 @@ def save_features(dataloader, batch_size, n_features, filename):
     shape = features_.shape
     features_ = features_.reshape(shape[0]*shape[1], shape[2])
     labels_ = labels_.reshape(shape[0]*shape[1])
-    feature_mat = np.concatenate((features_, labels_[:, np.newaxis]), axis=1)
+    feature_mat = np.concatenate((features_, labels_[:, np.newaxis]), axis=1).astype(np.float16)
     np.savetxt(filename, feature_mat)
 
 
 dataset = 'mnist'
-dataroot = '/home/AsifKhan/data/project/lsun/data'
+dataroot = '/home/asif/course-work/DeepLearningCV/project/lsun/data'
 imageSize = 64
 
 if dataset in ['imagenet', 'food']:
@@ -71,39 +78,40 @@ assert dataset
 batch_size = 100
 num_workers = 3
 
-dataloader = torch.utils.data.DataLoader(dataset, batch_size=batch_size,
+model_path = '/home/asif/course-work/DeepLearningCV/project/model/'
+features_path = '/home/asif/course-work/DeepLearningCV/project/features/'
+
+dataset_name = 'mnist'
+feature_file = features_path + 'features_{}.txt'.format(dataset_name)
+
+print('Saving Features')
+if not os.path.exists(feature_file):
+    dataloader = torch.utils.data.DataLoader(dataset, batch_size=batch_size,
                     shuffle=True, num_workers=num_workers)
 
-filters = [4, 4, 4, 4, 4]
-strides = [1, 2, 2, 2, 2]
-padding = [0, 1, 1, 1, 1]
+    filters = [4, 4, 4, 4, 4]
+    strides = [1, 2, 2, 2, 2]
+    padding = [0, 1, 1, 1, 1]
 
-nz = 256
-ngf = 128
-ndf = 128
-lrd = 0.001
-lrg = 0.001
-beta1 = 0.5
-
-model_path = '/home/AsifKhan/data/project/model/'
-result_path = '/home/AsifKhan/data/project/results/'
-
-
-
-netD = Discriminator(ndf, nc, filters, strides, padding)
-epoch = 10
-netD.load_state_dict(torch.load(model_path + 'netD_epoch_{}.pth'.format(epoch)))
-print(netD)
-netD.eval()
-n_features = 4096 # 1024x2x2
-
-feature_file = dataroot + '/train_features_{}.txt'.format(dataset)
-
-if not os.path.exists(feature_file):
+    nz = 256
+    ngf = 128
+    ndf = 128
+    lrd = 0.001
+    lrg = 0.001
+    beta1 = 0.5
+    
+    netD = Discriminator(ndf, nc, filters, strides, padding)
+    netD.cuda()
+    
+    epoch = 10
+    netD.load_state_dict(torch.load(model_path + 'netD_epoch_{}.pth'.format(epoch)))
+    
+    print(netD)
+    netD.eval()
+    n_features = 4096 # 1024x2x2
     save_features(dataloader, batch_size, n_features, feature_file)
 
-print('load features')
-
+print('Load Features')
 data = np.loadtxt(feature_file, dtype=np.float16)
 features, labels = data[:, : -1], data[:, -1: ]
 shape = features.shape
