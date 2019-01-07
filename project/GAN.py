@@ -83,7 +83,6 @@ class Discriminator(nn.Module):
 
 
 	def forward(self, x):
-		pdb.set_trace()
 		out = self.conv5(self.conv4(self.conv3(self.conv2(self.conv1(x)))))
 		return out.view(-1, 1).squeeze(1)
 
