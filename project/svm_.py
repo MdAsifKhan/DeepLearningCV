@@ -8,7 +8,7 @@ import torch.backends.cudnn as cudnn
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import classification_report
 from sklearn import svm
-
+from arguments import opt
 cudnn.benchmark = True
 
 def assert_path(path):
@@ -35,92 +35,75 @@ def save_features(dataloader, batch_size, n_features, filename):
     np.savetxt(filename, feature_mat)
 
 
-dataset = 'mnist'
-dataroot = '/home/asif/course-work/DeepLearningCV/project/lsun/data'
-imageSize = 64
+feature_file = features_path + 'features_{}.txt'.format(opt.dataset)
 
-if dataset in ['imagenet', 'food']:
-    dataset = dset.ImageFolder(root=dataroot,
+if opt.dataset in ['imagenet', 'food']:
+    dataset = dset.ImageFolder(root=opt.dataroot,
                             transform=transforms.Compose([
-                            transforms.Resize(imageSize),
-                            transforms.CenterCrop(imageSize),
+                            transforms.Resize(opt.imageSize),
+                            transforms.CenterCrop(opt.imageSize),
                             transforms.ToTensor(),
                             transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5)),
                             ]))
     nc=3
 
 elif dataset == 'lsun':
-    dataset = dset.LSUN(root=dataroot, classes=['conference_room_train'],
+    dataset = dset.LSUN(root=opt.dataroot, classes=['conference_room_train'],
                             transform=transforms.Compose([
-                            transforms.Resize(imageSize),
-                            transforms.CenterCrop(imageSize),
+                            transforms.Resize(opt.imageSize),
+                            transforms.CenterCrop(opt.imageSize),
                             transforms.ToTensor(),
                             transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5)),
                         ]))
     nc=3
 
 elif dataset == 'mnist':
-    dataset = dset.MNIST(root=dataroot, download=True,
+    dataset = dset.MNIST(root=opt.dataroot, download=True,
                             transform=transforms.Compose([
-                            transforms.Resize(imageSize),
+                            transforms.Resize(opt.imageSize),
                             transforms.ToTensor(),
                             transforms.Normalize((0.5,), (0.5,)),
                         ]))
     nc=1
 
 elif dataset == 'fake':
-    dataset = dset.FakeData(image_size=(3, imageSize, imageSize),
+    dataset = dset.FakeData(image_size=(3, opt.imageSize, opt.imageSize),
                                 transform=transforms.ToTensor())
     nc=3
 
 assert dataset
 
-batch_size = 100
-num_workers = 3
-
-model_path = '/home/asif/course-work/DeepLearningCV/project/model/'
-features_path = '/home/asif/course-work/DeepLearningCV/project/features/'
-
-dataset_name = 'mnist'
-feature_file = features_path + 'features_{}.txt'.format(dataset_name)
 
 print('Saving Features')
 if not os.path.exists(feature_file):
-    dataloader = torch.utils.data.DataLoader(dataset, batch_size=batch_size,
-                    shuffle=True, num_workers=num_workers)
+    dataloader = torch.utils.data.DataLoader(dataset, batch_size=opt.batch_size,
+                    shuffle=True, num_workers=opt.num_workers)
 
-    filters = [4, 4, 4, 4, 4]
-    strides = [1, 2, 2, 2, 2]
-    padding = [0, 1, 1, 1, 1]
-
-    nz = 256
-    ngf = 128
-    ndf = 128
-    lrd = 0.001
-    lrg = 0.001
-    beta1 = 0.5
     
-    netD = Discriminator(ndf, nc, filters, strides, padding)
+    netD = Discriminator(opt.ndf, opt.nc, opt.filters, opt.strides, opt.padding)
     netD.cuda()
     
     epoch = 10
-    netD.load_state_dict(torch.load(model_path + 'netD_epoch_{}.pth'.format(epoch)))
+    netD.load_state_dict(torch.load(opt.model_path + 'netD_epoch_{}.pth'.format(epoch)))
     
     print(netD)
     netD.eval()
     n_features = 4096 # 1024x2x2
-    save_features(dataloader, batch_size, n_features, feature_file)
+    save_features(dataloader, opt.batch_size, n_features, feature_file)
 
 print('Load Features')
 data = np.loadtxt(feature_file, dtype=np.float16)
+
 features, labels = data[:, : -1], data[:, -1: ]
 shape = features.shape
-print('Data has {} samples and {} features '.format(shape[0], shape[1]))
 
+print('Data has {} samples and {} features '.format(shape[0], shape[1]))
 X_train, X_test, y_train, y_test = train_test_split(features, labels, test_size=0.33, random_state=42)
 
 print('Train SVM')
+
 clf = svm.SVC(decision_function_shape='ovo')
 clf.fit(X_train, y_train)
+
 predict_labels = clf.predict(X_test)
 print(classification_report(y_test, predict_labels))
